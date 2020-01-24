@@ -83,21 +83,28 @@ void FrontEnd::parseCrop(const Model& model, const ie::CNNLayerPtr& _layer, cons
     IE_ASSERT(layer != nullptr);
     IE_ASSERT(layer->axis.size() == layer->offset.size());
 
-    auto cropAxis = layer->axis[0];
-    if (cropAxis < 0) {
-        cropAxis += 4;
-    }
-
-    if (cropAxis < 0 || cropAxis > 3) {
-        VPU_THROW_EXCEPTION
-            << "Layer " << layer->name << " [" << layer->type
-            << "] has invalid axis value. Expected: 0 <= axis < 4, Actual: " << cropAxis;
-    }
-
-    auto stage = model->addNewStage<CropStage>(layer->name, StageType::Crop, layer, inputs, outputs);
+    auto stage = model->addNewStage<CropStage>(
+        layer->name,
+        StageType::Crop,
+        layer,
+        inputs,
+        outputs);
 
     DimValues offset;
-    for (int i = 0; i < layer->offset.size(); i++) {
+
+    for (int i = 0; i < offset.size(); i++) {
+
+        auto cropAxis = layer->axis[i];
+        if (cropAxis < 0) {
+            cropAxis += 4;
+        }
+
+        if (cropAxis < 0 || cropAxis > 3) {
+            VPU_THROW_EXCEPTION
+                << "Layer " << layer->name << " [" << layer->type
+                << "] has invalid axis value. Expected: 0 <= axis < 4, Actual: " << cropAxis;
+        }
+
         offset.set(static_cast<Dim>(3 - cropAxis - i), layer->offset[i]);
     }
 
