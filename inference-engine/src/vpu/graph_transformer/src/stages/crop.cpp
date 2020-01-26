@@ -123,7 +123,8 @@ void FrontEnd::parseCrop(
                 << "] has invalid axis value. Expected: 0 <= axis < 4, Actual: " << cropAxis;
         }
 
-        offset.set(static_cast<Dim>(3 - cropAxis - i), layer->offset[i]);
+        //offset.set(static_cast<Dim>(3 - cropAxis - i), layer->offset[i]);
+        offset.set(static_cast<Dim>(cropAxis), layer->offset[i]);
     }
 
     stage->attrs().set("offset", offset);
